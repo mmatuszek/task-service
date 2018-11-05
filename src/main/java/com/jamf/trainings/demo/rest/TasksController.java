@@ -11,13 +11,13 @@ import java.util.HashMap;
 import java.util.Map;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.client.HttpStatusCodeException;
@@ -28,16 +28,20 @@ import com.jamf.trainings.demo.domain.tasks.HrClient;
 import com.jamf.trainings.demo.domain.tasks.Task;
 
 @RestController
+@RequestMapping(path = "/tasks")
 public class TasksController {
 
   private static final Logger LOG = LoggerFactory.getLogger(TasksController.class);
 
   private Map<String, Task> tasksRepo = synchronizedMap(new HashMap());
 
-  @Autowired
-  private HrClient hrClient;
+  private final HrClient hrClient;
 
-  @GetMapping(path = "/tasks", params = "managerId")
+  public TasksController(HrClient hrClient) {
+    this.hrClient = hrClient;
+  }
+
+  @GetMapping
   public Collection<TaskDto> find(
       @RequestParam("managerId") String managerId) {
 
@@ -45,7 +49,7 @@ public class TasksController {
       throw new BadRequestException("managerId query parameter is required.");
     }
 
-    Collection<Employee> managerEmployees = getEmployeesByManagerId(managerId);
+    Collection<Employee> managerSubordinates = tryToGetSubordinates(managerId);
 
     // return all tasks which are assigned to at least one employee of those manager
     return tasksRepo.values().stream()
@@ -57,7 +61,7 @@ public class TasksController {
           dto.setConfirmed(task.isConfirmed());
 
           Collection<String> dtoEmployees = task.getEmployees().stream()
-              .filter(managerEmployees::contains)
+              .filter(managerSubordinates::contains)
               .map(employee -> format("%s %s", employee.getFirstName(), employee.getLastName()))
               .collect(toList());
 
@@ -68,7 +72,7 @@ public class TasksController {
         .collect(toList());
   }
 
-  @PostMapping(path = "/tasks")
+  @PostMapping
   public String create(@RequestBody NewTaskDto newTask) {
 
     if (!StringUtils.hasText(newTask.getDocumentId())) {
@@ -88,6 +92,7 @@ public class TasksController {
       task.setEmployees(hrClient.getEmployeesForDepartment(newTask.getDepartmentsId()));
     } catch (HttpStatusCodeException | ResourceAccessException e) {
       LOG.warn("Can not get employees.", e);
+      task.setEmployees(emptyList());
     }
     tasksRepo.put(id, task);
 
@@ -96,18 +101,18 @@ public class TasksController {
     return id;
   }
 
-  @PutMapping(path = "/tasks/{taskId}")
+  @PutMapping(path = "/{taskId}")
   public void update(
       @PathVariable("taskId") String taskId) {
 
     Task task = tasksRepo.get(taskId);
-
     if (task == null) {
-      // TODO 404
+      throw new NotFoundException(format("Task %s not found.", taskId));
     }
+    task.setConfirmed(true);
   }
 
-  private Collection<Employee> getEmployeesByManagerId(String managerId) {
+  private Collection<Employee> tryToGetSubordinates(String managerId) {
     try {
       return hrClient.getSubordinates(managerId);
     } catch (HttpStatusCodeException | ResourceAccessException e) {
