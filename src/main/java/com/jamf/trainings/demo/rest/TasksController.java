@@ -1,5 +1,6 @@
-package com.jamf.trainings.demo;
+package com.jamf.trainings.demo.rest;
 
+import static java.lang.String.format;
 import static java.util.Collections.emptyList;
 import static java.util.Collections.synchronizedMap;
 import static java.util.UUID.randomUUID;
@@ -24,6 +25,7 @@ import org.springframework.web.client.ResourceAccessException;
 
 import com.jamf.trainings.demo.domain.tasks.Employee;
 import com.jamf.trainings.demo.domain.tasks.HrClient;
+import com.jamf.trainings.demo.domain.tasks.Task;
 
 @RestController
 public class TasksController {
@@ -36,36 +38,43 @@ public class TasksController {
   private HrClient hrClient;
 
   @GetMapping(path = "/tasks", params = "managerId")
-  public Collection<Task> find(
+  public Collection<TaskDto> find(
       @RequestParam("managerId") String managerId) {
 
-    // TODO call for /subortinates by managerId
-    try {
-      Collection<Employee> employees = hrClient.getSubordinates(managerId);
-
-      // return all tasks which are assigned to at least one employee of those manager
-      return tasksRepo.values().stream().filter(task -> {
-        for (Employee employee : employees) {
-          if (task.getEmployees().stream().anyMatch(taskEmployee -> taskEmployee.equals(employee))) {
-            return true;
-          }
-        }
-        return false;
-      }).collect(toList());
-
-    } catch (HttpStatusCodeException | ResourceAccessException e) {
-      LOG.warn("Can not get employees.", e);
-      return emptyList();
+    if (!StringUtils.hasText(managerId)) {
+      throw new BadRequestException("managerId query parameter is required.");
     }
+
+    Collection<Employee> managerEmployees = getEmployeesByManagerId(managerId);
+
+    // return all tasks which are assigned to at least one employee of those manager
+    return tasksRepo.values().stream()
+        .map(task -> {
+
+          TaskDto dto = new TaskDto();
+          dto.setId(task.getId());
+          dto.setDocumentId(task.getDocumentId());
+          dto.setConfirmed(task.isConfirmed());
+
+          Collection<String> dtoEmployees = task.getEmployees().stream()
+              .filter(managerEmployees::contains)
+              .map(employee -> format("%s %s", employee.getFirstName(), employee.getLastName()))
+              .collect(toList());
+
+          dto.setEmployees(dtoEmployees);
+
+          return dto;
+        })
+        .collect(toList());
   }
 
   @PostMapping(path = "/tasks")
   public String create(@RequestBody NewTaskDto newTask) {
 
-    if(!StringUtils.hasText(newTask.getDocumentId())) {
+    if (!StringUtils.hasText(newTask.getDocumentId())) {
       throw new BadRequestException("documentId is required");
     }
-    if(newTask.getDepartmentsId() == null || newTask.getDepartmentsId().isEmpty()) {
+    if (newTask.getDepartmentsId() == null || newTask.getDepartmentsId().isEmpty()) {
       throw new BadRequestException("departmentIds is required");
     }
 
@@ -95,6 +104,15 @@ public class TasksController {
 
     if (task == null) {
       // TODO 404
+    }
+  }
+
+  private Collection<Employee> getEmployeesByManagerId(String managerId) {
+    try {
+      return hrClient.getSubordinates(managerId);
+    } catch (HttpStatusCodeException | ResourceAccessException e) {
+      LOG.warn("Can not get employees.", e);
+      return emptyList();
     }
   }
 }
