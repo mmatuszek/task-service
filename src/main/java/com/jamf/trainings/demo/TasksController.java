@@ -63,10 +63,10 @@ public class TasksController {
   public String create(@RequestBody NewTaskDto newTask) {
 
     if(!StringUtils.hasText(newTask.getDocumentId())) {
-      throw new BadRequestException("Document ID is required");
+      throw new BadRequestException("documentId is required");
     }
     if(newTask.getDepartmentsId() == null || newTask.getDepartmentsId().isEmpty()) {
-      throw new BadRequestException("Department IDs is required");
+      throw new BadRequestException("departmentIds is required");
     }
 
     String id = randomUUID().toString();
