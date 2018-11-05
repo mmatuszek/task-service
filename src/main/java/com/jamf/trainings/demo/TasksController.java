@@ -6,7 +6,6 @@ import static java.util.UUID.randomUUID;
 import static java.util.stream.Collectors.toList;
 
 import java.util.Collection;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import org.slf4j.Logger;
@@ -20,8 +19,8 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.client.HttpClientErrorException.BadRequest;
 import org.springframework.web.client.HttpStatusCodeException;
+import org.springframework.web.client.ResourceAccessException;
 
 import com.jamf.trainings.demo.domain.tasks.Employee;
 import com.jamf.trainings.demo.domain.tasks.HrClient;
@@ -54,7 +53,7 @@ public class TasksController {
         return false;
       }).collect(toList());
 
-    } catch (HttpStatusCodeException e) {
+    } catch (HttpStatusCodeException | ResourceAccessException e) {
       LOG.warn("Can not get employees.", e);
       return emptyList();
     }
@@ -78,7 +77,7 @@ public class TasksController {
 
     try {
       task.setEmployees(hrClient.getEmployeesForDepartment(newTask.getDepartmentsId()));
-    } catch (HttpStatusCodeException e) {
+    } catch (HttpStatusCodeException | ResourceAccessException e) {
       LOG.warn("Can not get employees.", e);
     }
     tasksRepo.put(id, task);
