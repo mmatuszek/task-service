@@ -88,6 +88,7 @@ public class TasksController {
       task.setEmployees(hrClient.getEmployeesForDepartment(newTask.getDepartmentsId()));
     } catch (HttpStatusCodeException | ResourceAccessException e) {
       LOG.warn("Can not get employees.", e);
+      task.setEmployees(emptyList());
     }
     tasksRepo.put(id, task);
 
@@ -101,10 +102,10 @@ public class TasksController {
       @PathVariable("taskId") String taskId) {
 
     Task task = tasksRepo.get(taskId);
-
     if (task == null) {
-      // TODO 404
+      throw new NotFoundException(format("Task %s not found.", taskId));
     }
+    task.setConfirmed(true);
   }
 
   private Collection<Employee> getEmployeesByManagerId(String managerId) {
