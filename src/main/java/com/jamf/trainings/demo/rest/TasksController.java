@@ -11,7 +11,6 @@ import java.util.HashMap;
 import java.util.Map;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -36,8 +35,11 @@ public class TasksController {
 
   private Map<String, Task> tasksRepo = synchronizedMap(new HashMap());
 
-  @Autowired
-  private HrClient hrClient;
+  private final HrClient hrClient;
+
+  public TasksController(HrClient hrClient) {
+    this.hrClient = hrClient;
+  }
 
   @GetMapping
   public Collection<TaskDto> find(
@@ -47,7 +49,7 @@ public class TasksController {
       throw new BadRequestException("managerId query parameter is required.");
     }
 
-    Collection<Employee> managerEmployees = getEmployeesByManagerId(managerId);
+    Collection<Employee> managerSubordinates = tryToGetSubordinates(managerId);
 
     // return all tasks which are assigned to at least one employee of those manager
     return tasksRepo.values().stream()
@@ -59,7 +61,7 @@ public class TasksController {
           dto.setConfirmed(task.isConfirmed());
 
           Collection<String> dtoEmployees = task.getEmployees().stream()
-              .filter(managerEmployees::contains)
+              .filter(managerSubordinates::contains)
               .map(employee -> format("%s %s", employee.getFirstName(), employee.getLastName()))
               .collect(toList());
 
@@ -110,7 +112,7 @@ public class TasksController {
     task.setConfirmed(true);
   }
 
-  private Collection<Employee> getEmployeesByManagerId(String managerId) {
+  private Collection<Employee> tryToGetSubordinates(String managerId) {
     try {
       return hrClient.getSubordinates(managerId);
     } catch (HttpStatusCodeException | ResourceAccessException e) {
