@@ -1,4 +1,4 @@
-package com.jamf.trainings.demo;
+package com.jamf.trainings.demo.rest;
 
 import static org.springframework.http.HttpStatus.BAD_REQUEST;
 

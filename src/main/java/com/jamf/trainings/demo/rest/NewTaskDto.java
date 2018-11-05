@@ -1,4 +1,4 @@
-package com.jamf.trainings.demo;
+package com.jamf.trainings.demo.rest;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
