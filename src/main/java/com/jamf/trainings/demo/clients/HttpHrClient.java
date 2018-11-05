@@ -14,7 +14,7 @@ import com.jamf.trainings.demo.domain.tasks.HrClient;
 @Component
 public class HttpHrClient implements HrClient {
 
-  private final static String HR_DEPARTMENT_URL = "http://192.168.1.111:8080/departments/%s";
+  private final static String HR_DEPARTMENT_URL = "http://192.168.1.111:8080/employees?departmentId=%s";
   private final static String HR_SUBORDINATES_URL = "http://192.168.1.111:8080/employees/%s/subordinates";
 
   @Autowired
@@ -22,7 +22,7 @@ public class HttpHrClient implements HrClient {
 
   @Override
   public Collection<Employee> getEmployeesForDepartment(Collection<String> deptIds) {
-    StringBuilder idsParam = new StringBuilder("&");
+    StringBuilder idsParam = new StringBuilder();
     for (String id : deptIds) {
       idsParam.append(id).append(",");
     }

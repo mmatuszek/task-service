@@ -1,20 +1,30 @@
 package com.jamf.trainings.demo.domain.tasks;
 
-import com.fasterxml.jackson.annotation.JsonCreator;
 import java.util.Objects;
 
 public class Employee {
 
-  private final String id;
-  private final String deptId;
-  private final String firstName;
-  private final String lastName;
+  private String id;
+  private Department department;
+  private String firstName;
+  private String lastName;
 
-  @JsonCreator
-  public Employee(String id, String deptId, String firstName, String lastName) {
+  public Employee() {
+  }
+
+  public void setId(String id) {
     this.id = id;
-    this.deptId = deptId;
+  }
+
+  public void setDepartment(Department department) {
+    this.department = department;
+  }
+
+  public void setFirstName(String firstName) {
     this.firstName = firstName;
+  }
+
+  public void setLastName(String lastName) {
     this.lastName = lastName;
   }
 
@@ -22,8 +32,8 @@ public class Employee {
     return id;
   }
 
-  public String getDeptId() {
-    return deptId;
+  public Department getDepartment() {
+    return department;
   }
 
   public String getFirstName() {
@@ -44,13 +54,14 @@ public class Employee {
     }
     Employee employee = (Employee) o;
     return Objects.equals(id, employee.id) &&
-        Objects.equals(deptId, employee.deptId) &&
+        Objects.equals(department, employee.department) &&
         Objects.equals(firstName, employee.firstName) &&
         Objects.equals(lastName, employee.lastName);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(id, deptId, firstName, lastName);
+    return Objects.hash(id, department, firstName, lastName);
   }
+
 }
