@@ -2,11 +2,13 @@ package com.jamf.trainings.demo;
 
 import java.util.Collection;
 
+import com.jamf.trainings.demo.domain.tasks.Employee;
+
 public class Task {
 
   private String id;
   private String documentId;
-  private Collection<String> employees;
+  private Collection<Employee> employees;
   private boolean confirmed;
 
   public String getId() {
@@ -25,11 +27,11 @@ public class Task {
     this.documentId = documentId;
   }
 
-  public Collection<String> getEmployees() {
+  public Collection<Employee> getEmployees() {
     return employees;
   }
 
-  public void setEmployees(Collection<String> employees) {
+  public void setEmployees(Collection<Employee> employees) {
     this.employees = employees;
   }
 
@@ -39,5 +41,16 @@ public class Task {
 
   public void setConfirmed(boolean confirmed) {
     this.confirmed = confirmed;
+  }
+
+  @Override
+  public String toString() {
+    final StringBuilder sb = new StringBuilder("Task{");
+    sb.append("id='").append(id).append('\'');
+    sb.append(", documentId='").append(documentId).append('\'');
+    sb.append(", employees=").append(employees);
+    sb.append(", confirmed=").append(confirmed);
+    sb.append('}');
+    return sb.toString();
   }
 }

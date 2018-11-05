@@ -3,6 +3,7 @@ package com.jamf.trainings.demo.clients;
 import static org.junit.Assert.assertFalse;
 
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.List;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -23,7 +24,7 @@ public class HrClientTests {
   public void shouldReturnEmployees() {
 
     //when
-    List<Employee> employees = hrClient.getEmployeesForDepartment(Arrays.asList("123", "345"));
+    Collection<Employee> employees = hrClient.getEmployeesForDepartment(Arrays.asList("123", "345"));
 
     //then
     assertFalse(employees.isEmpty());
@@ -33,7 +34,7 @@ public class HrClientTests {
   public void shouldReturnSubordinates() {
 
     //when
-    List<Employee> employees = hrClient.getSubordinates("123");
+    Collection<Employee> employees = hrClient.getSubordinates("123");
 
     //then
     assertFalse(employees.isEmpty());

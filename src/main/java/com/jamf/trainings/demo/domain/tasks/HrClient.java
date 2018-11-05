@@ -1,11 +1,12 @@
 package com.jamf.trainings.demo.domain.tasks;
 
+import java.util.Collection;
 import java.util.List;
 
 public interface HrClient {
 
-  List<Employee> getEmployeesForDepartment(List<String> deptIds);
+  Collection<Employee> getEmployeesForDepartment(Collection<String> deptIds);
 
-  List<Employee> getSubordinates(String managerId);
+  Collection<Employee> getSubordinates(String managerId);
 
 }

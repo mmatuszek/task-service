@@ -1,5 +1,6 @@
 package com.jamf.trainings.demo.clients;
 
+import java.util.Collection;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.ParameterizedTypeReference;
@@ -20,7 +21,7 @@ public class HttpHrClient implements HrClient {
   private RestTemplate restTemplate;
 
   @Override
-  public List<Employee> getEmployeesForDepartment(List<String> deptIds) {
+  public Collection<Employee> getEmployeesForDepartment(Collection<String> deptIds) {
     StringBuilder idsParam = new StringBuilder("&");
     for (String id : deptIds) {
       idsParam.append(id).append(",");
@@ -32,7 +33,7 @@ public class HttpHrClient implements HrClient {
   }
 
   @Override
-  public List<Employee> getSubordinates(String managerId) {
+  public Collection<Employee> getSubordinates(String managerId) {
     String url = String.format(HR_SUBORDINATES_URL, managerId);
     return restTemplate.exchange(url, HttpMethod.GET, null, new ParameterizedTypeReference<List<Employee>>() {
     }).getBody();
