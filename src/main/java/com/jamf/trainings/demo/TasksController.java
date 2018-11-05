@@ -53,6 +53,7 @@ public class TasksController {
         }
         return false;
       }).collect(toList());
+
     } catch (HttpStatusCodeException e) {
       LOG.warn("Can not get employees.", e);
       return emptyList();

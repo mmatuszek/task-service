@@ -1,7 +1,6 @@
 package com.jamf.trainings.demo.domain.tasks;
 
 import java.util.Collection;
-import java.util.List;
 
 public interface HrClient {
 

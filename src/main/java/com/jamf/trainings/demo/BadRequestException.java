@@ -1,10 +1,10 @@
 package com.jamf.trainings.demo;
 
-import static org.springframework.http.HttpStatus.NOT_FOUND;
+import static org.springframework.http.HttpStatus.BAD_REQUEST;
 
 import org.springframework.web.bind.annotation.ResponseStatus;
 
-@ResponseStatus(value = NOT_FOUND)
+@ResponseStatus(value = BAD_REQUEST)
 public class BadRequestException extends IllegalArgumentException {
 
   public BadRequestException(String s) {
