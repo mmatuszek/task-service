@@ -1,5 +1,6 @@
 package com.jamf.trainings.demo.clients;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,14 +23,14 @@ public class HttpHrClient implements HrClient {
 
   @Override
   public Collection<Employee> getEmployeesForDepartment(Collection<String> deptIds) {
-    StringBuilder idsParam = new StringBuilder();
+    List<Employee> employees = new ArrayList<>();
     for (String id : deptIds) {
-      idsParam.append(id).append(",");
+      String url = String.format(HR_DEPARTMENT_URL, id);
+      List<Employee> employeesForDept = restTemplate.exchange(url, HttpMethod.GET, null, new ParameterizedTypeReference<List<Employee>>() {
+      }).getBody();
+      employees.addAll(employeesForDept);
     }
-    idsParam = new StringBuilder(idsParam.substring(0, idsParam.length() - 1));
-    String url = String.format(HR_DEPARTMENT_URL, idsParam.toString());
-    return restTemplate.exchange(url, HttpMethod.GET, null, new ParameterizedTypeReference<List<Employee>>() {
-    }).getBody();
+    return employees;
   }
 
   @Override

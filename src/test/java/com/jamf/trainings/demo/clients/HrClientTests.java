@@ -24,7 +24,7 @@ public class HrClientTests {
   public void shouldReturnEmployees() {
 
     //when
-    Collection<Employee> employees = hrClient.getEmployeesForDepartment(Arrays.asList("c0538165-4dc2-44b8-9b58-67b850bb7369"));
+    Collection<Employee> employees = hrClient.getEmployeesForDepartment(Arrays.asList("b5c4e3c4-1da0-41d5-9583-341b07d689b4", "546b0e19-768f-4fa1-a46a-2b8de3d67bba"));
 
     //then
     assertFalse(employees.isEmpty());
