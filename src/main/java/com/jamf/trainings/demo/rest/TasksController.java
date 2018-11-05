@@ -18,6 +18,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.client.HttpStatusCodeException;
@@ -28,6 +29,7 @@ import com.jamf.trainings.demo.domain.tasks.HrClient;
 import com.jamf.trainings.demo.domain.tasks.Task;
 
 @RestController
+@RequestMapping(path = "/tasks")
 public class TasksController {
 
   private static final Logger LOG = LoggerFactory.getLogger(TasksController.class);
@@ -37,7 +39,7 @@ public class TasksController {
   @Autowired
   private HrClient hrClient;
 
-  @GetMapping(path = "/tasks", params = "managerId")
+  @GetMapping
   public Collection<TaskDto> find(
       @RequestParam("managerId") String managerId) {
 
@@ -68,7 +70,7 @@ public class TasksController {
         .collect(toList());
   }
 
-  @PostMapping(path = "/tasks")
+  @PostMapping
   public String create(@RequestBody NewTaskDto newTask) {
 
     if (!StringUtils.hasText(newTask.getDocumentId())) {
@@ -97,7 +99,7 @@ public class TasksController {
     return id;
   }
 
-  @PutMapping(path = "/tasks/{taskId}")
+  @PutMapping(path = "/{taskId}")
   public void update(
       @PathVariable("taskId") String taskId) {
 
